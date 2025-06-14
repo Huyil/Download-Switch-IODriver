@@ -47,7 +47,7 @@ void BATadcCB(void *arg)
     bat_handler(0);
   }
   
-  io.batAdc = bat.value;
+  io.batAdc = bat.value>>2;
   io.batLv = bat.level<0?8:bat.level;
   io.chrg = CHGE_READ();
   io.done = DONE_READ();

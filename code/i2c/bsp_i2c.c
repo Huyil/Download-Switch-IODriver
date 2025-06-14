@@ -60,10 +60,10 @@ void I2C_IRQHandler(void)
               {
                 enum CHxMode _mode = (enum CHxMode)data;
                 switch (u8RegAddr) {
-                  case 0x10: io.ch[0].mode = _mode; break;
-                  case 0x11: io.ch[1].mode = _mode; break;
-                  case 0x12: io.ch[2].mode = _mode; break;
-                  case 0x13: io.ch[3].mode = _mode; break;
+                  case 0x10: IO_set(CH1,_mode);break;   //io.ch[0].mode = _mode; 
+                  case 0x11: IO_set(CH2,_mode);break;   //io.ch[1].mode = _mode; 
+                  case 0x12: IO_set(CH3,_mode);break;   //io.ch[2].mode = _mode; 
+                  case 0x13: IO_set(CH4,_mode);break;   //io.ch[3].mode = _mode; 
                   default: break;
                 }
               } 
@@ -112,10 +112,10 @@ void I2C_IRQHandler(void)
                 u8SendLen = 2;
                 break;
             case 0x02:
-                u8Senddata[0] = (io.ioset >> 0) & 0xFF;
-                u8Senddata[1] = (io.ioset >> 8) & 0xFF;
-                u8Senddata[2] = (io.ioset >> 16) & 0xFF;
-                u8Senddata[3] = (io.ioset >> 24) & 0xFF;
+                u8Senddata[0] = *(uint8_t*)&io.ch[0];
+                u8Senddata[1] = *(uint8_t*)&io.ch[1];
+                u8Senddata[2] = *(uint8_t*)&io.ch[2];
+                u8Senddata[3] = *(uint8_t*)&io.ch[3];
                 u8SendLen = 4;
                 break;
             default:

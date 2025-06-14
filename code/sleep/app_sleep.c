@@ -28,7 +28,6 @@ void read_Pinstate(void)
     }
     else{
       sys.cfg.ch = POWER_CONNECTED;
-      
     }
   }else if(sys.cfg.sw == POWER_OFF)
   {
@@ -161,7 +160,7 @@ void System_Handle()
       {
         sleep_tick++;
       }else{
-        if(KEY_PW_READ() == 0)
+        if(KEY_PW_READ() == 1)
         {
           sleep_tick = 0;
           sys.lowPower_tick = 0;

@@ -111,7 +111,7 @@
 
 #define VIN_GPIO   CHRG_GPIO
 #define VIN_Pin    (DONE_Pin|CHRG_Pin)
-#define VI_DET_READ()     (((VIN_GPIO ->IDR & VIN_Pin)==3)?0:1u)
+#define VI_DET_READ()     (((VIN_GPIO ->IDR & VIN_Pin)==(DONE_Pin|CHRG_Pin))?0:1u)
 #define DONE_READ()       ((DONE_GPIO ->IDR & DONE_Pin)?1u:0)
 #define CHGE_READ()       ((CHRG_GPIO ->IDR & CHRG_Pin)?0:1u)
 
@@ -123,9 +123,9 @@
 #define KEY_ALL_Pin      (KEY1_Pin|KEY2_Pin|KEY3_Pin|KEY4_Pin|KEY5_Pin)
 #define KEY_READ()      (KEY1_GPIO ->IDR & KEY_ALL_Pin)
 
-#define KEY_PW_READ() KEY1_READ()
-#define KEY_PW_GPIO   KEY1_GPIO
-#define KEY_PW_Pin    KEY1_Pin
+#define KEY_PW_READ() KEY3_READ()
+#define KEY_PW_GPIO   KEY3_GPIO
+#define KEY_PW_Pin    KEY3_Pin
 
 #define ESP_EN(i)    (i)?(ESP_EN_GPIO->BSRR = ESP_EN_Pin):(ESP_EN_GPIO->BRR = ESP_EN_Pin)
 #define VOUT_EN(i)   (i)?(VOUT_EN_GPIO->BSRR = VOUT_EN_Pin):(VOUT_EN_GPIO->BRR = VOUT_EN_Pin)

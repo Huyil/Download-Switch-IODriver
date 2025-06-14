@@ -7,7 +7,7 @@
 #include "debug.h"
 
 struct Button PowerKey;     // µÁ‘¥
-struct Button AddKey;       // add
+struct Button VinKey;       // add
 struct Button SubKey;       // dec
 
 io_one gei_io;
@@ -31,14 +31,19 @@ void KeyPower_CB(void* btu)
     ESP_EN(1);
     
     sys.cfg.sw = POWER_ON;
-  }else
+  }else if(sys.cfg.ch == POWER_DISCONNECTED)
   {
-    if(sys.cfg.ch == POWER_DISCONNECTED)
-    {
-      ESP_EN(0);
-      PinMode_Set(MODE_SWD);
-    }
+    ESP_EN(0);
+    PinMode_Set(MODE_SWD);
     sys.cfg.sw = POWER_OFF;
+  }
+}
+
+void KeyVin_CB(void* btu)
+{
+  if(sys.cfg.sw == POWER_OFF)
+  {
+    KeyPower_CB(0);
   }
 }
 
@@ -61,6 +66,17 @@ uint8_t readKeyStatus(uint8_t id)
   return 1; 
 }
 
+uint8_t readPowerStatus(uint8_t id)
+{
+  switch(id)
+  {
+    case 0: return !VI_DET_READ();
+    case 1: return DONE_READ();
+    case 2: return CHGE_READ();
+  }
+  return 1;
+}
+
 void KeyEnter_CB(void* btu)
 {
   enum CHx ch = CH1;
@@ -74,10 +90,14 @@ void KeyEnter_CB(void* btu)
 void Key_Init(void)
 {
   button_init(&PowerKey,readKeyStatus, 0,  0,SHORT_TICKS,LONG_TICKS);
+  button_init(&VinKey,  readPowerStatus, 0,  0,SHORT_TICKS,LONG_TICKS);
   
-  button_attach(&PowerKey, SINGLE_CLICK,     KeyEnter_CB);
+  //button_attach(&PowerKey, SINGLE_CLICK,     KeyEnter_CB);
   button_attach(&PowerKey, LONG_PRESS_START, KeyPower_CB);
+  //button_attach(&VinKey, PRESS_DOWN, KeyVin_CB);
+  button_attach(&VinKey, LONG_PRESS_START,   KeyVin_CB);
 
   button_start(&PowerKey);
+  button_start(&VinKey);
 }
 

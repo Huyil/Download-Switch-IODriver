@@ -8,22 +8,54 @@ BAT_BUF bat;
 
 void bat_level2BATLv(void)
 {
-  if(bat.level < 310)
+  static int lastBATLevel = -2;
+  
+  int newLevel = lastBATLevel;
+  switch (lastBATLevel)
   {
-    if(bat.tempLv < 300)
-      sys.BATLevel = -1;
-    else sys.BATLevel = 0;
-  }
-  else if(bat.level < 330)
-    sys.BATLevel = 0;
-  else if(bat.level < 360)
-    sys.BATLevel = 1;
-  else if(bat.level < 380)
-    sys.BATLevel = 2;
-  else if(bat.level < 400)
-    sys.BATLevel = 3;
-  else
-    sys.BATLevel = 4;
+    case -1:
+      if (bat.level > 305) newLevel = 0;
+      break;
+    case 0:
+      if (bat.level < 295) newLevel = -1;
+      else if (bat.level > 335) newLevel = 1;
+      break;
+    case 1:
+      if (bat.level < 325) newLevel = 0;
+      else if (bat.level > 365) newLevel = 2;
+      break;
+    case 2:
+      if (bat.level < 355) newLevel = 1;
+      else if (bat.level > 385) newLevel = 3;
+      break;
+    case 3:
+      if (bat.level < 375) newLevel = 2;
+      else if (bat.level > 405) newLevel = 4;
+      break;
+    case 4:
+      if (bat.level < 395) newLevel = 3;
+      break;
+    default: // ³õÊ¼×´Ì¬»òÎ´Öª
+      if (bat.level < 300)
+        newLevel = -1;
+      else if (bat.level < 330)
+        newLevel = 0;
+      else if (bat.level < 360)
+        newLevel = 1;
+      else if (bat.level < 380)
+        newLevel = 2;
+      else if (bat.level < 400)
+        newLevel = 3;
+      else
+        newLevel = 4;
+      break;
+    }
+  
+    if (newLevel != lastBATLevel)
+    {
+      sys.BATLevel = newLevel;
+      lastBATLevel = newLevel;
+    }
 }
 
 inline uint16_t abs_int16(int16_t x1,int16_t x2)
@@ -142,7 +174,7 @@ int8_t bat_chargrStateGet(uint8_t init)
 
 }
 
-void bat_handler(void* arg)
+void bat_handler1(void* arg)
 {
   static uint16_t oldValue;
   int8_t charge;
@@ -175,6 +207,21 @@ void bat_handler(void* arg)
     }
   }
   bat_level2BATLv();
+}
+
+
+void bat_handler(void* arg)
+{
+  int charge = bat_chargrStateGet(0);
+  if (charge < 0) return;
+
+  bat.tempLv = adc_Abat2bat(bat.value);
+  if (bat.tempLv < 0) return;
+
+  bat.level = bat.tempLv;
+
+  bat_level2BATLv();
+  
 }
 
 uint8_t bat_Ref()
